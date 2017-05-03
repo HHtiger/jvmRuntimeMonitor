@@ -1,0 +1,6 @@
+rootProject.name = "jvmRuntimeMonitor"
+
+include "monitor-server"
+include "monitor-client"
+include 'monitor-utils'
+
