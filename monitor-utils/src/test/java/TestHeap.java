@@ -14,15 +14,6 @@ import java.lang.management.ManagementFactory;
 public class TestHeap {
 
     @Test
-    public void TestString() {
-        String s = "as";
-        System.out.printf("s addr : %d \n", VM.current().addressOf(s));
-
-        String s1 = "a" + "s";
-        System.out.printf("s1 addr : %d \n", VM.current().addressOf(s1));
-    }
-
-    @Test
     public void testOperatingSystem() {
         OperatingSystemMXBean osmb = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         System.out.println("系统物理内存总计：" + osmb.getTotalPhysicalMemorySize());
@@ -60,22 +51,70 @@ public class TestHeap {
     }
 
     @Test
-    public void testObject() throws NoSuchFieldException, UnsupportedEncodingException {
+    public void testArray() {
 
-        A o = new A();
-        o.a = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-        System.out.println(ClassLayout.parseInstance(o).toPrintable());
-        System.out.println(ClassLayout.parseInstance(o.a).toPrintable());
+        char c = 'c';
+        System.out.println(VM.current().sizeOf(c));
+        System.out.println(ClassLayout.parseInstance(c).toPrintable());
 
-        long lo = VM.current().addressOf(o);
-        long lo_a = VM.current().addressOf(o.a);
-        System.out.printf("%d \n", lo);
-        System.out.printf("%d \n", lo_a);
+        char[] s = new char[]{'a', 'b', 'c', 'd'};
+        long address_of_s = VM.current().addressOf(s);
+        long array_offset = MemoryUtils.UNSAFE.arrayBaseOffset(s.getClass());
 
-        long string_value_offset = VM.current().fieldOffset(String.class.getDeclaredField("value"));
+        System.out.println(ClassLayout.parseInstance(s).toPrintable());
 
-        System.out.println(string_value_offset);
-        System.out.println(MemoryUtils.UNSAFE.getByte(lo_a + string_value_offset));
+        System.out.printf("address of s is %d \n", address_of_s);
+
+        int step = MemoryUtils.UNSAFE.arrayIndexScale(char[].class);
+
+        System.out.println(MemoryUtils.UNSAFE.getChar(address_of_s + array_offset + 0 * step));
+        System.out.println(MemoryUtils.UNSAFE.getChar(address_of_s + array_offset + 1 * step));
+        System.out.println(MemoryUtils.UNSAFE.getChar(address_of_s + array_offset + 2 * step));
 
     }
+
+
+    @Test
+    public void testString() {
+        String s = "as";
+        System.out.printf("s addr : %d \n", VM.current().addressOf(s));
+
+        String s1 = "a" + "s";
+        System.out.printf("s1 addr : %d \n", VM.current().addressOf(s1));
+    }
+
+    @Test
+    public void testString2() throws NoSuchFieldException, UnsupportedEncodingException {
+
+        A o = new A();
+
+        long addressOfA = VM.current().addressOf(o);
+        System.out.printf("address of o is %d \n", addressOfA);
+        System.out.println(ClassLayout.parseInstance(o).toPrintable());
+
+        long addressOfA_a = VM.current().addressOf(o.a);
+        System.out.printf("address of o.a is %d \n", addressOfA_a);
+        System.out.println(ClassLayout.parseInstance(o.a).toPrintable());
+
+        long addressOfA_b = VM.current().addressOf(o.b);
+        System.out.printf("address of o.b is %d \n", addressOfA_b);
+        System.out.println(ClassLayout.parseInstance(o.b).toPrintable());
+
+        long A_a_offset = VM.current().fieldOffset(A.class.getDeclaredField("a"));
+        System.out.printf("A_a_offset offset is %d \n", A_a_offset);
+
+        long A_b_offset = VM.current().fieldOffset(A.class.getDeclaredField("b"));
+        System.out.printf("A_b_offset offset is %d \n", A_b_offset);
+
+        System.out.println(MemoryUtils.UNSAFE.getObject(o,A_a_offset));
+
+        String c = "ccc";
+
+        MemoryUtils.UNSAFE.putObject(o,A_a_offset,c);
+
+        System.out.println(o.a);
+
+
+    }
+
 }

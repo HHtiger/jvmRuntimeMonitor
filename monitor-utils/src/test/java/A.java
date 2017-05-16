@@ -3,8 +3,8 @@
  */
 public class A {
 
-    public String a;
+    public String a = "aaa";
 
-    public String b;
+    public String b = "bbb";
 
 }
