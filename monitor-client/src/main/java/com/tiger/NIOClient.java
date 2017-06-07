@@ -30,7 +30,7 @@ public class NIOClient {
             @Override
             public void run() {
                 while (true){
-                    byte[] obj = new byte[100*MemoryUnit._1M];
+//                    byte[] obj = new byte[100*MemoryUnit._1M];
                     logger.info("new 100M.");
 
                     try {
